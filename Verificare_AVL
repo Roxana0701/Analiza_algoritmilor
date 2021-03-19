@@ -1,0 +1,159 @@
+// Verificare daca un arbore binar dat este AVL sau nu 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+typedef struct nod {
+	int key;
+	int h;
+	struct nod *st;
+	struct nod *dr;
+}nod;
+
+nod *radacina = NULL;
+int probabilitate = 1; //presupunere ca e avl
+
+nod *initializare(nod *radacina)
+{
+	if (radacina != NULL)
+	{
+
+		free(radacina);
+	}
+	radacina = NULL;
+	return radacina;
+}
+
+int maxim_nod(int a, int b)
+{
+	if (a > b)
+		return a;
+	else
+		return b;
+
+}
+
+int factor_echil(nod *n)
+{
+	if (n == NULL)
+	{
+		return 0;
+
+	}
+	else
+	{
+		if (n != NULL && n->st != NULL && n->dr != NULL)
+		{
+			return ((n->st->h) - (n->dr->h));
+		}
+		else
+		{
+			if (n != NULL && n->st == NULL && n->dr != NULL)
+			{
+				return(-(n->dr->h));
+			}
+			else
+			{
+				if (n != NULL && n->st == NULL && n->dr == NULL)
+					return 0;
+			}
+		}
+	}
+
+}
+nod *insereaza(int keyy, nod *n)
+{
+	if (n == NULL)
+	{
+		nod *nood;
+		nood = (nod*)malloc(sizeof(nod));
+		nood->key = keyy;
+		nood->st = NULL;
+		nood->dr = NULL;
+		nood->h = 1;
+		return nood;
+	}
+	if (n != NULL)
+	{
+		if (keyy < n->key)
+		{
+			n->st = insereaza(keyy, n->st);
+		}
+		else
+		{
+			if (keyy > n->key)
+			{
+				n->dr = insereaza(keyy, n->dr);
+			}
+			else
+			{
+				return n;
+			}
+		}
+	}
+	if (n != NULL && n->st != NULL && n->dr != NULL)
+	{
+		n->h = maxim_nod(n->st->h, n->dr->h) + 1;
+	}
+	else
+	{
+		if (n != NULL && n->st == NULL && n->dr != NULL)
+		{
+			n->h = maxim_nod(0, n->dr->h) + 1;
+		}
+		else
+		{
+			if (n != NULL && n->st != NULL && n->dr == NULL)
+			{
+				n->h = maxim_nod(n->st->h, 0) + 1;
+			}
+			else
+			{
+				if (n != NULL && n->st == NULL && n->dr == NULL)
+				{
+					n->h = maxim_nod(0, 0) + 1;
+				}
+			}
+		}
+	}
+	return n;
+}
+
+void verificare_AVL(nod* radacina)
+{
+	if (radacina != NULL)
+	{
+		if (abs(factor_echil(radacina)) >= 2)  //==0 perfect echilibrat
+		{
+			probabilitate = 0;//am gasit un subarbore dezechilibrat, deci arborele nu mai este AVL
+			return;
+		}
+		verificare_AVL(radacina->st);
+		verificare_AVL(radacina->dr);
+	}
+}
+
+int main()
+{
+	radacina = initializare(radacina);
+	radacina = insereaza(12, radacina);
+	radacina = insereaza(5, radacina);
+	radacina = insereaza(40, radacina);
+	radacina = insereaza(19, radacina);
+	radacina = insereaza(27, radacina);
+	radacina = insereaza(33, radacina);
+	radacina = insereaza(22, radacina);
+	verificare_AVL(radacina);
+	if (probabilitate == 1)
+	{
+		printf("Arborele binar ordonat este AVL!\n");
+	}
+	else
+	{
+		printf("Arborele binar ordonat NU este AVL!\n");
+	}
+
+	return 0;
+}
